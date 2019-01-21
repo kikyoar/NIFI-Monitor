@@ -14,7 +14,6 @@ import urllib3
 import json
 import re
 
-
 http = urllib3.PoolManager()
 # NIFI API
 url = "http://127.0.0.1:18088/nifi-api/"
@@ -93,16 +92,17 @@ class ClusterProcessGroupsStaus:
     # 由于有TB、MB和GB、KB、bytes的存在，所以分开判断，bytes数据量太小，忽略不计
     def queuedSize(self):
         if 'GB' in self.aggregateSnapshot['queuedSize']:
-            sub_queuedSize = re.findall(r'\d+\S\d*', self.aggregateSnapshot['queuedSize'])
+            # 如果出现3,502这种去掉,
+            sub_queuedSize = re.findall(r'\d+\S\d*', self.aggregateSnapshot['queuedSize'].replace(',', ''))
             print('%.2f' % float(sub_queuedSize[0]))
         elif 'bytes' in self.aggregateSnapshot['queuedSize']:
             print(0)
         elif 'TB' in self.aggregateSnapshot['queuedSize']:
-            sub_queuedSize = re.findall(r'\d+', self.aggregateSnapshot['queuedSize'])
+            sub_queuedSize = re.findall(r'\d+', self.aggregateSnapshot['queuedSize'].replace(',', ''))
             sub_queuedSize = int(sub_queuedSize[0]) * 1000
             print('%.2f' % float(sub_queuedSize))
         elif 'MB' in self.aggregateSnapshot['queuedSize']:
-            sub_queuedSize = re.findall(r'\d+', self.aggregateSnapshot['queuedSize'])
+            sub_queuedSize = re.findall(r'\d+', self.aggregateSnapshot['queuedSize'].replace(',', ''))
             sub_queuedSize = int(sub_queuedSize[0]) / 1000
             print('%.2f' % float(sub_queuedSize))
         elif 'KB' in self.aggregateSnapshot['queuedSize']:
@@ -159,7 +159,7 @@ class ClusterProcessGroupsStaus:
 
             if 'GB' in queuedSize:
                 sub_queuedSize = re.findall(r'\d+\S\d+', queuedSize)
-                #判断是否为空列表
+                # 判断是否为空列表
                 if len(sub_queuedSize) > 0:
                     sub_conversion = sub_queuedSize[0]
                     conversion = float(sub_conversion) / int(backPressureDataSize)
