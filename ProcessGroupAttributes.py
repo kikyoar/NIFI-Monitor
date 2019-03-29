@@ -144,6 +144,7 @@ class ClusterProcessGroupsStaus:
             # queuedCount这个有可能输出为1,365这种带','
             if ',' in queuedCount:
                 queuedCount = re.findall(r'\d+', queuedCount.replace(',', ''))
+                queuedCount = queuedCount[0]
             backPressureDataSize = (re.findall(r'\d+', backPressureDataSizeThreshold))[0]
             #int(float('1.5'))
             sub_queuedCount = int(queuedCount) / int(backPressureObjectThreshold)
